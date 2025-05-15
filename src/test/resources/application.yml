@@ -1,0 +1,16 @@
+app:
+  frontend:
+    url: http://localhost:9097
+  backend:
+    url: http://localhost:9097
+
+spring:
+  session:
+    redis:
+      namespace: spring:session
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:9090

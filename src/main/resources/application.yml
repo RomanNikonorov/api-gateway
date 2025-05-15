@@ -1,0 +1,67 @@
+app:
+  backend:
+    url: https://nikonorov.me
+  frontend:
+    url: http://localhost:9090
+
+server:
+  compression:
+    enabled: true
+    min-response-size: 1024  # minimum response size in bytes to enable compression
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+  shutdown: immediate
+  port: 9090
+  http2:
+    enabled: false
+
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: actuator
+          order: 5
+          uri: http://localhost:18080
+          predicates:
+            - Path=/actuator/**
+        - id: login
+          order: 10
+          uri: http://localhost:18080
+          predicates:
+            - Path=/login/**
+        - id: default
+          order: 999999
+          uri: https://nikonorov.me
+          filters:
+            - name: TokenRelay
+          predicates:
+            - Path=/**
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: backend
+            client-secret: d2Na2Ulb5QWZ9rZIZJYkvOu3RXYVKdMe
+            scope: openid,profile,email
+            redirect-uri: http://localhost:9090/login/oauth2/code/keycloak
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/office
+  session:
+    redis:
+      namespace: gateway
+  data:
+    redis:
+      host: localhost
+      password: ""
+      port: 6379
+  webflux:
+    session:
+      cookie:
+        name: GATEWAY_SESSION
+        http-only: true
+        secure: false
+        same-site: lax
