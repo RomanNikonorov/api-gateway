@@ -16,6 +16,9 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
@@ -47,9 +50,15 @@ public class ErrorHandlerConfig {
             Map<String, Object> errorPropertiesMap = getErrorAttributes(request,
                     ErrorAttributeOptions.defaults());
 
-            return ServerResponse.status(HttpStatus.valueOf((Integer) errorPropertiesMap.get("status")))
+            Map<String, Object> customResponse = new HashMap<>();
+            customResponse.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+            customResponse.put("status", errorPropertiesMap.get("status"));
+            customResponse.put("error", errorPropertiesMap.get("error"));
+            customResponse.put("path", request.path());
+
+            return ServerResponse.status(HttpStatus.valueOf((Integer) customResponse.get("status")))
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(BodyInserters.fromValue(errorPropertiesMap));
+                    .body(BodyInserters.fromValue(customResponse));
         }
     }
 }

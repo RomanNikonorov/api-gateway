@@ -44,7 +44,7 @@ spring:
         registration:
           keycloak:
             client-id: backend
-            client-secret: d2Na2Ulb5QWZ9rZIZJYkvOu3RXYVKdMe
+            client-secret: ${client-secret}
             scope: openid,profile,email
             redirect-uri: http://localhost:9090/login/oauth2/code/keycloak
         provider:
@@ -52,11 +52,13 @@ spring:
             issuer-uri: http://localhost:8080/realms/office
   session:
     redis:
-      namespace: gateway
+      namespace: gateway-session
+  oauth2:
+    redis:
+      namespace: gateway-token
   data:
     redis:
       host: localhost
-      password: ""
       port: 6379
   webflux:
     session:
@@ -65,3 +67,8 @@ spring:
         http-only: true
         secure: false
         same-site: lax
+
+
+logging:
+  level:
+    me.nikonorovrs.gateway: DEBUG
